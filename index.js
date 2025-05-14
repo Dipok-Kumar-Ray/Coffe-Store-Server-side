@@ -12,8 +12,6 @@ app.use(express.json())
 
 //user : cofee-monster
 //pass : wEbTpXvnC9sKyVb4
-
-
 // console.log(process.env.BD_USER);
 // console.log(process.env.BD_PASS);
 
@@ -38,6 +36,16 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    
+    const coffeesCollection = client.db('coffeeDB').collection('coffees')
+
+    app.post('/coffees', async(req, res) => {
+      const newCoffee = req.body;
+      console.log(newCoffee);
+      const result = await coffeesCollection.insertOne(newCoffee);
+      res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
