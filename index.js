@@ -38,11 +38,14 @@ async function run() {
     // await client.connect();
     
     const coffeesCollection = client.db('coffeeDB').collection('coffees');   
+    const usersCollection = client.db('coffeeDB').collection('users');
 
+
+    //Read kora hoyeche
     app.get('/coffees', async(req, res) => {
         // const cursor = coffeesCollection.find();
         // const result = await cursor.toArray();
-
+        //
         const result = await coffeesCollection.find().toArray();
         res.send(result);
     })
@@ -57,7 +60,7 @@ async function run() {
     })
 
 
-
+    //post mane tw insert kora hoyeche
     app.post('/coffees', async(req, res) => {
       const newCoffee = req.body;
       console.log(newCoffee);
@@ -66,7 +69,7 @@ async function run() {
     })
 
 
-
+    //ekhane update korano hoyeche
     app.put('/coffees/:id' , async(req, res) => {
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)}
@@ -79,13 +82,39 @@ async function run() {
       res.send(result)
     })
 
+    //one or two data patching korano hoyeche
+    app.patch('/users', async(req, res) => {
+      const {email, lastSignInTime} = req.body;
+      const filter = {email: email }
+      const updatedDoc = {
+        $set: {
+          lastSignInTime: lastSignInTime
+        }
+      }
 
+      const result = await usersCollection.updateOne(filter, updatedDoc)
+      res.send(result);
+    })
+
+
+    //data delete korano hoyeche 
     app.delete('/coffees/:id', async(req, res) => {
       const id = req.params.id;
       const query = {_id : new ObjectId(id)}
       const result  = await coffeesCollection.deleteOne(query);
       res.send(result);
     })
+
+
+    //User related APIs
+    app.post('/users', async(req, res) => {
+      const userProfile = req.body;
+      console.log(userProfile);
+      const result = await usersCollection.insertOne(userProfile);
+      res.send(result);
+    })
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -106,5 +135,5 @@ app.get('/', (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Coffe server is running on port${port}`);
+    console.log(`Coffe server is running on port : ${port}`);
 })
